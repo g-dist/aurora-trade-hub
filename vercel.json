@@ -1,5 +1,11 @@
 {
   "buildCommand": "npm run build:gdist",
   "outputDirectory": "apps/gdist/dist",
-  "framework": "vite"
+  "framework": "vite",
+  "installCommand": "npm install",
+  "git": {
+    "deploymentEnabled": {
+      "main": true
+    }
+  }
 }
