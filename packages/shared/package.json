@@ -1,0 +1,12 @@
+{
+  "name": "@aurora/shared",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./supabase": "./src/supabase.ts",
+    "./i18n": "./src/i18n/index.ts",
+    "./types": "./src/types.ts",
+    "./currency": "./src/currency.ts"
+  }
+}

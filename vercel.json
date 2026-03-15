@@ -1,0 +1,5 @@
+{
+  "buildCommand": "npm run build:gdist",
+  "outputDirectory": "apps/gdist/dist",
+  "framework": "vite"
+}

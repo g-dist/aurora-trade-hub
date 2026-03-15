@@ -1,0 +1,13 @@
+{
+  "name": "aurora-trade-hub",
+  "private": true,
+  "version": "0.0.1",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:gdist": "npm run dev --workspace=apps/gdist",
+    "dev:buyer": "npm run dev --workspace=apps/buyer",
+    "build": "npm run build --workspaces",
+    "build:gdist": "npm run build --workspace=apps/gdist",
+    "build:buyer": "npm run build --workspace=apps/buyer"
+  }
+}

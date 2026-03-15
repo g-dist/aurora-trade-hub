@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 240 10% 97%;
+    --card: 240 10% 7%;
+    --card-foreground: 240 10% 97%;
+    --popover: 240 10% 7%;
+    --popover-foreground: 240 10% 97%;
+    --primary: 263 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 10%;
+    --secondary-foreground: 240 10% 97%;
+    --muted: 240 10% 10%;
+    --muted-foreground: 245 15% 55%;
+    --accent: 166 76% 39%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 245 15% 18%;
+    --input: 245 15% 12%;
+    --ring: 263 70% 50%;
+    --radius: 0.75rem;
+
+    /* Brand tokens */
+    --navy: 240 10% 4%;
+    --gold: 43 52% 54%;
+    --gray-light: 240 10% 7%;
+    --surface: 240 10% 7%;
+    --surface-elevated: 240 10% 10%;
+    --surface-hover: 0 0% 100% / 0.05;
+
+    /* Status tokens */
+    --status-red: 0 84% 60%;
+    --status-amber: 37 91% 50%;
+    --status-green: 160 84% 39%;
+    --status-blue: 199 89% 48%;
+    --status-purple: 263 70% 50%;
+
+    /* Sidebar */
+    --sidebar-background: 240 12% 5%;
+    --sidebar-foreground: 240 10% 97%;
+    --sidebar-primary: 263 70% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 10% 10%;
+    --sidebar-accent-foreground: 240 10% 97%;
+    --sidebar-border: 245 15% 14%;
+    --sidebar-ring: 263 70% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* Aurora keyframes */
+@keyframes aurora-drift-1 {
+  0%, 100% { transform: translateX(-10%) translateY(-5%) rotate(0deg) scale(1.1); opacity: 0.6; }
+  25% { transform: translateX(5%) translateY(-15%) rotate(3deg) scale(1.2); opacity: 0.8; }
+  50% { transform: translateX(-5%) translateY(5%) rotate(-2deg) scale(1.05); opacity: 0.5; }
+  75% { transform: translateX(10%) translateY(-10%) rotate(5deg) scale(1.15); opacity: 0.7; }
+}
+
+@keyframes aurora-drift-2 {
+  0%, 100% { transform: translateX(5%) translateY(5%) rotate(0deg) scale(1.2); opacity: 0.4; }
+  33% { transform: translateX(-15%) translateY(-8%) rotate(-4deg) scale(1.05); opacity: 0.6; }
+  66% { transform: translateX(10%) translateY(-15%) rotate(2deg) scale(1.15); opacity: 0.3; }
+}
+
+@keyframes aurora-drift-3 {
+  0%, 100% { transform: translateX(0%) translateY(-10%) rotate(0deg) scale(1.1); opacity: 0.5; }
+  50% { transform: translateX(-10%) translateY(8%) rotate(-5deg) scale(1.25); opacity: 0.7; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* Status badges - dark theme Perplexity style */
+.badge-in-stock { background: hsl(160 84% 39% / 0.15); color: hsl(160 84% 39%); }
+.badge-pending { background: hsl(37 91% 50% / 0.15); color: hsl(37 91% 50%); }
+.badge-cancelled { background: hsl(0 84% 60% / 0.15); color: hsl(0 84% 60%); }
+.badge-preorder { background: hsl(263 70% 50% / 0.15); color: hsl(263 70% 50%); }
+.badge-low-stock { background: hsl(37 91% 50% / 0.15); color: hsl(37 91% 50%); }
+.badge-in-transit { background: hsl(199 89% 48% / 0.15); color: hsl(199 89% 48%); }
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(245 15% 20%);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(245 15% 30%);
+}
