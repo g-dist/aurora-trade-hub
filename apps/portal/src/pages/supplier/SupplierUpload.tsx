@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import PortalLayout from "@/components/PortalLayout";
-import { LayoutDashboard, Package, Upload, ShoppingCart, User } from "lucide-react";
+import { LayoutDashboard, Package, Upload, ShoppingCart, User, ImagePlus, X } from "lucide-react";
 import { supabase } from "@aurora/shared/supabase";
 
 const NOK_TO_CNY = 0.65;
@@ -48,12 +48,44 @@ const navItems = [
 const SupplierUpload = () => {
   const { t } = useTranslation();
   const [form, setForm] = useState<FormState>(empty);
+  const [supplierId, setSupplierId] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch the supplier record ID for the logged-in user
+  useEffect(() => {
+    const fetchSupplierId = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from('suppliers')
+        .select('id')
+        .eq('user_id', user.id)
+        .single();
+      if (data) setSupplierId(data.id);
+    };
+    fetchSupplierId();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,7 +93,31 @@ const SupplierUpload = () => {
     setSubmitting(true);
     setError(null);
 
-    const { data: { user } } = await supabase.auth.getUser();
+    if (!supplierId) {
+      setError('Supplier account not found. Contact your administrator.');
+      setSubmitting(false);
+      return;
+    }
+
+    // Upload image if selected
+    let image_url: string | null = null;
+    if (imageFile) {
+      const ext = imageFile.name.split('.').pop();
+      const filename = `${supplierId}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(filename, imageFile, { upsert: true });
+      if (uploadError) {
+        setError(`Image upload failed: ${uploadError.message}`);
+        setSubmitting(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(filename);
+      image_url = urlData.publicUrl;
+    }
+
     const price_nok = parseFloat(form.price_nok) || 0;
     const price_cny = Math.round(price_nok * NOK_TO_CNY);
 
@@ -70,6 +126,7 @@ const SupplierUpload = () => {
       product_number: form.product_number || null,
       category: form.category,
       price_nok,
+      supplier_price_nok: price_nok,
       price_cny,
       price_range: `${price_nok.toLocaleString('nb-NO')} NOK`,
       stock_s: parseInt(form.stock_s) || 0,
@@ -78,8 +135,9 @@ const SupplierUpload = () => {
       stock_xl: parseInt(form.stock_xl) || 0,
       stock_xxl: parseInt(form.stock_xxl) || 0,
       description: form.description,
+      image_url,
       status: 'pending',
-      supplier_id: user?.id ?? null,
+      supplier_id: supplierId,
     }]);
 
     if (insertError) {
@@ -87,6 +145,7 @@ const SupplierUpload = () => {
     } else {
       setSuccess(true);
       setForm(empty);
+      clearImage();
     }
     setSubmitting(false);
   };
@@ -186,7 +245,46 @@ const SupplierUpload = () => {
                 </div>
               </div>
 
-              {/* Row 3: Stock per size grid */}
+              {/* Row 3: Image upload */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                  Produktbilde
+                </label>
+                {imagePreview ? (
+                  <div className="relative w-32 h-32">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-32 h-32 object-cover rounded-lg border border-border"
+                    />
+                    <button
+                      type="button"
+                      onClick={clearImage}
+                      className="absolute -top-2 -right-2 bg-card border border-border rounded-full p-0.5 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 px-4 py-2.5 border border-dashed border-border rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                    Last opp bilde (valgfritt)
+                  </button>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
+              </div>
+
+              {/* Row 4: Stock per size grid */}
               <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Lager per størrelse
@@ -210,7 +308,7 @@ const SupplierUpload = () => {
                 </div>
               </div>
 
-              {/* Row 4: Description */}
+              {/* Row 5: Description */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   {t('description')}
@@ -232,7 +330,7 @@ const SupplierUpload = () => {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || !supplierId}
                 className="w-full py-2.5 bg-accent text-accent-foreground font-medium rounded-lg text-sm hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
               >
                 {submitting ? t('submitting') : t('submit_for_review')}

@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
+import Inquiry from "@/pages/Inquiry";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Unauthorized from "@/pages/Unauthorized";
 import NotFound from "@/pages/NotFound";
@@ -38,6 +39,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/inquiry" element={<Inquiry />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
 
           {/* Supplier Portal */}
