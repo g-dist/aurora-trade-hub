@@ -1,6 +1,6 @@
 {
-  "buildCommand": "npm run build:gdist",
-  "outputDirectory": "apps/gdist/dist",
+  "buildCommand": "npm run build:portal",
+  "outputDirectory": "apps/portal/dist",
   "framework": "vite",
   "installCommand": "npm install",
   "git": {

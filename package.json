@@ -4,10 +4,10 @@
   "version": "0.0.1",
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
-    "dev:gdist": "npm run dev --workspace=apps/gdist",
-    "dev:buyer": "npm run dev --workspace=apps/buyer",
+    "dev:portal": "npm run dev --workspace=apps/portal",
+    "dev:jessica": "npm run dev --workspace=apps/jessica",
     "build": "npm run build --workspaces",
-    "build:gdist": "npm run build --workspace=apps/gdist",
-    "build:buyer": "npm run build --workspace=apps/buyer"
+    "build:portal": "npm run build --workspace=apps/portal",
+    "build:jessica": "npm run build --workspace=apps/jessica"
   }
 }

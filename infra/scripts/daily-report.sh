@@ -69,7 +69,7 @@ EOF
 
 if [ -d "$REPO" ]; then
   cd "$REPO"
-  TEST_OUTPUT=$(npm run test --workspace=apps/gdist 2>&1 | tail -20 || echo "Tester feilet")
+  TEST_OUTPUT=$(npm run test --workspace=apps/portal 2>&1 | tail -20 || echo "Tester feilet")
   echo "\`\`\`" >> "$REPORT_FILE"
   echo "$TEST_OUTPUT" >> "$REPORT_FILE"
   echo "\`\`\`" >> "$REPORT_FILE"

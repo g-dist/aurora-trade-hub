@@ -6,7 +6,7 @@ _Oppdatert: 2026-03-16_
 
 | Prosjekt | App | Repo | URL |
 |----------|-----|------|-----|
-| `web-platform` | apps/gdist | g-dist/aurora-trade-hub | _(se Vercel dashboard)_ |
+| `web-platform` | apps/portal | g-dist/aurora-trade-hub | _(se Vercel dashboard)_ |
 
 ## Første gang (én manuell operasjon)
 
@@ -56,8 +56,8 @@ vercel env rm KEY production
 
 ```json
 {
-  "buildCommand": "npm run build:gdist",
-  "outputDirectory": "apps/gdist/dist",
+  "buildCommand": "npm run build:portal",
+  "outputDirectory": "apps/portal/dist",
   "framework": "vite",
   "installCommand": "npm install"
 }

@@ -12,8 +12,8 @@ To-persons selskap (Daniel + Martin) som driver B2B-handel mellom europeiske spo
 ## Apps i dette monorepoet
 | App | Rute | Brukere | Branding |
 |-----|------|---------|---------|
-| `apps/gdist` | `/admin/*` + `/supplier/*` | Daniel, Martin, leverandører | Global Distribution AS |
-| `apps/buyer` | Eget repo (jessica-buyer-portal) | Asiatiske kjøpere | JessicaGD / Jessica |
+| `apps/portal` | `/admin/*` + `/supplier/*` | Daniel, Martin, leverandører | Global Distribution AS |
+| `apps/jessica` | Eget repo (jessica-buyer-portal) | Asiatiske kjøpere | JessicaGD / Jessica |
 
 ## Stack
 - React 18 + Vite + TypeScript
