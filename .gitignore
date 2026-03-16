@@ -8,3 +8,4 @@ dist
 .vercel
 settings.local.json
 infra/logs/
+.env*.local

@@ -1,9 +1,10 @@
 -- =============================================================
 -- Global Distribution AS — Row Level Security (RLS) Policies
 -- Migrering: 20260315000002_rls_policies.sql
+-- Idempotent: dropper og recreater policies
 -- =============================================================
 
--- Enable RLS on all tables
+-- Enable RLS (trygt å kjøre flere ganger)
 alter table public.profiles enable row level security;
 alter table public.user_roles enable row level security;
 alter table public.suppliers enable row level security;
@@ -22,18 +23,26 @@ alter table public.invoices enable row level security;
 -- -------------------------------------------------------
 -- Helper: sjekk om innlogget bruker har en rolle
 -- -------------------------------------------------------
-create or replace function public.has_role(required_role user_role)
+create or replace function public.has_role(required_role text)
 returns boolean as $$
   select exists (
     select 1 from public.user_roles
     where user_id = auth.uid()
-    and role = required_role
+    and role::text = required_role
   );
 $$ language sql security definer stable;
 
 -- -------------------------------------------------------
+-- Drop eksisterende policies (idempotent)
+-- -------------------------------------------------------
+do $$ declare pol record; begin
+  for pol in select policyname, tablename from pg_policies where schemaname = 'public' loop
+    execute format('drop policy if exists %I on public.%I', pol.policyname, pol.tablename);
+  end loop;
+end $$;
+
+-- -------------------------------------------------------
 -- PROFILES
--- Brukere ser kun sin egen profil; admin ser alle
 -- -------------------------------------------------------
 create policy "profiles: own profile" on public.profiles
   for all using (id = auth.uid());
@@ -43,7 +52,6 @@ create policy "profiles: admin sees all" on public.profiles
 
 -- -------------------------------------------------------
 -- USER_ROLES
--- Kun admin kan tildele/endre roller
 -- -------------------------------------------------------
 create policy "user_roles: read own" on public.user_roles
   for select using (user_id = auth.uid());
@@ -53,7 +61,6 @@ create policy "user_roles: admin full" on public.user_roles
 
 -- -------------------------------------------------------
 -- SUPPLIERS
--- Admin: full tilgang | Supplier: kun sin egen rad
 -- -------------------------------------------------------
 create policy "suppliers: admin full" on public.suppliers
   for all using (public.has_role('admin'));
@@ -63,7 +70,6 @@ create policy "suppliers: own record" on public.suppliers
 
 -- -------------------------------------------------------
 -- BUYERS
--- Admin: full | Buyer: kun sin egen rad
 -- -------------------------------------------------------
 create policy "buyers: admin full" on public.buyers
   for all using (public.has_role('admin'));
@@ -73,8 +79,6 @@ create policy "buyers: own record" on public.buyers
 
 -- -------------------------------------------------------
 -- PRODUCTS
--- Admin: full | Supplier: produkter fra sin leverandør
--- Buyer: lese aktive produkter
 -- -------------------------------------------------------
 create policy "products: admin full" on public.products
   for all using (public.has_role('admin'));
@@ -94,7 +98,6 @@ create policy "products: buyer reads active" on public.products
 
 -- -------------------------------------------------------
 -- QUOTES
--- Admin: full | Buyer: egne quotes
 -- -------------------------------------------------------
 create policy "quotes: admin full" on public.quotes
   for all using (public.has_role('admin'));
@@ -120,7 +123,6 @@ create policy "quote_items: buyer via quote" on public.quote_items
 
 -- -------------------------------------------------------
 -- ORDERS
--- Admin: full | Buyer: egne ordrer | Supplier: ordrer med sine produkter
 -- -------------------------------------------------------
 create policy "orders: admin full" on public.orders
   for all using (public.has_role('admin'));
@@ -157,7 +159,7 @@ create policy "order_items: supplier sees own products" on public.order_items
   );
 
 -- -------------------------------------------------------
--- INVENTORY — Admin + Supplier (egne produkter)
+-- INVENTORY
 -- -------------------------------------------------------
 create policy "inventory: admin full" on public.inventory
   for all using (public.has_role('admin'));
@@ -169,12 +171,14 @@ create policy "inventory: supplier sees own" on public.inventory
   );
 
 -- -------------------------------------------------------
--- SHIPMENTS, CONTRACTS, PAYMENTS, INVOICES — Admin full
--- Buyer kan lese sine egne
+-- SHIPMENTS
 -- -------------------------------------------------------
 create policy "shipments: admin full" on public.shipments
   for all using (public.has_role('admin'));
 
+-- -------------------------------------------------------
+-- CONTRACTS
+-- -------------------------------------------------------
 create policy "contracts: admin full" on public.contracts
   for all using (public.has_role('admin'));
 
@@ -184,9 +188,15 @@ create policy "contracts: buyer reads own" on public.contracts
     buyer_id in (select id from public.buyers where user_id = auth.uid())
   );
 
+-- -------------------------------------------------------
+-- PAYMENTS
+-- -------------------------------------------------------
 create policy "payments: admin full" on public.payments
   for all using (public.has_role('admin'));
 
+-- -------------------------------------------------------
+-- INVOICES
+-- -------------------------------------------------------
 create policy "invoices: admin full" on public.invoices
   for all using (public.has_role('admin'));
 
