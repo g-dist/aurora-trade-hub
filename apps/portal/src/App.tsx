@@ -26,6 +26,7 @@ import AdminProducts from "@/pages/admin/AdminProducts";
 import AdminOrders from "@/pages/admin/AdminOrders";
 import AdminInventory from "@/pages/admin/AdminInventory";
 import AdminSettings from "@/pages/admin/AdminSettings";
+import QuoteGenerator from "@/pages/admin/QuoteGenerator";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
             <Route path="/admin/orders" element={<AdminOrders />} />
             <Route path="/admin/inventory" element={<AdminInventory />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/quotes/new" element={<QuoteGenerator />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
